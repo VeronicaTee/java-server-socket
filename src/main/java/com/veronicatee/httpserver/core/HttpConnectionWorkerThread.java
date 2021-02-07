@@ -9,7 +9,8 @@ import java.net.Socket;
 public class HttpConnectionWorkerThread extends Thread{
 
     private final static Logger LOGGER = LoggerFactory.getLogger(HttpConnectionWorkerThread.class);
-    private Socket socket;
+    private static Socket socket;
+
     public HttpConnectionWorkerThread(Socket socket) {
         this.socket = socket;
     }
@@ -22,35 +23,25 @@ public class HttpConnectionWorkerThread extends Thread{
             inputStream = socket.getInputStream();
             outputStream = socket.getOutputStream();
 
-            String html = "<html><head><title>Simple Java HTTP Server</title></head><body><h1>This page was served using my simple Java HTTP server</h1></body</html>";
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+            String inp = br.readLine();
+            System.out.println(this.getName() + inp);
 
+//            String html = "";
+
+//            html = "<html><head><title>Simple Java HTTP Server</title></head><body><h1>This page was served using my simple Java HTTP server</h1></body</html>";
 
             final String CRLF = "\n\r"; // 13, 10
 
             String response =
                     "HTTP/1.1 200 OK" + CRLF + //Status Line : HTTP VERSION RESPONSE_CODE RESPONSE_MESSAGE
-                            "Content-Length: " + html.getBytes().length + CRLF + //HEADER
+                            "Content-Length : " + clientResponse(inp).getBytes().length + CRLF +
                             CRLF +
-                            html +
+                            clientResponse(inp) +
                             CRLF + CRLF;
-            outputStream.write(response.getBytes());
+//                outputStream.write(response.getBytes());
 
             LOGGER.info("Connection Processing Finished");
-
-
-//            fs.readFile("index.html", function(err, data){
-//                if(err){
-//                    response.writeHead(404);
-//                    response.write("Not Found!");
-//                }
-//                else{
-//                    response.writeHead(200, {'Content-Type': contentType});
-//                    response.write(data);
-//                }
-//                response.end();
-//            }
-
-
         } catch (IOException e) {
             LOGGER.error("Problem with communication", e);
             e.printStackTrace();
@@ -79,6 +70,24 @@ public class HttpConnectionWorkerThread extends Thread{
             }
 
         }
+
+    }
+
+    public String clientResponse(String route) throws IOException {
+        String result = "";
+        String content;
+        if (route.contains("/json")) {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader("text.json"));
+            while ((content = bufferedReader.readLine()) != null) {
+                result += content;
+            }
+        } else {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader("text.html"));
+            while ((content = bufferedReader.readLine()) != null) {
+                result += content;
+            }
+        }
+        return result;
     }
 
 }

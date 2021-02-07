@@ -79,13 +79,4 @@ public class HttpParser {
     private void parserBody(InputStreamReader reader, HttpRequest request) {
     }
 
-
-//    if (path.endsWith("/")){
-//        path = "src/main/resources/http.html";
-//    } else if (path.endsWith("/json")) {
-//        path = "src/main/resources/http.json";
-//    } else {
-////                    throw IOException;
-//    }
-
 }
